@@ -54,7 +54,5 @@ runcmd:
   - systemctl restart docker
   - apt-mark hold kubelet kubeadm kubectl
   - kubeadm init --config /tmp/kubeadm.conf | grep -A1 '^kubeadm join' > /root/join-command
-  - mkdir /root/.kube
-  - cp /etc/kubernetes/admin.conf /root/.kube/config
   - while ! kubectl --kubeconfig /etc/kubernetes/admin.conf cluster-info; do echo 'Kubernetes not yet up... retrying in 5s'; sleep 5; done
   - kubectl --kubeconfig /etc/kubernetes/admin.conf apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')"

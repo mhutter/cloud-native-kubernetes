@@ -17,6 +17,9 @@ master:
 master_ip:
 	@echo $(MASTER_IP)
 
+admin.conf:
+	scp root@$(MASTER_IP):/etc/kubernetes/admin.conf .
+
 destroy: clean_known_hosts $(addprefix destroy_,$(MASTER))
 	rm -f admin.conf
 
