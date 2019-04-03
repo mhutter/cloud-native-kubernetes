@@ -1,3 +1,7 @@
+RAND_ID = $(shell openssl rand -hex 2)
+MASTER = $(shell hcloud server list -o noheader -o columns=name | grep '^master-')
+MASTER_IP = $(shell hcloud server list -o noheader -o columns=name,ipv4 | awk '/^master-/{ print $$2 }')
+
 usage:
 	@echo 'make [master|destroy|clean_known_hosts]'
 
@@ -8,10 +12,16 @@ master:
 		--ssh-key rokkit2019 \
 		--type cx21 \
 		--user-data-from-file cloud-config-master.yml \
-		--name master0.mhnet.ch
+		--name "master-$(RAND_ID).mhnet.ch"
 
-destroy: clean_known_hosts
-	hcloud server delete master0.mhnet.ch
+master_ip:
+	@echo $(MASTER_IP)
+
+destroy: clean_known_hosts $(addprefix destroy_,$(MASTER))
+	rm -f admin.conf
+
+destroy_%:
+	hcloud server delete $*
 
 clean_known_hosts:
 	sed -i .bak '/^(159|116)/d' ~/.ssh/known_hosts
