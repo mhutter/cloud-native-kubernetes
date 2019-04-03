@@ -27,6 +27,6 @@ destroy_%:
 	hcloud server delete $*
 
 clean_known_hosts:
-	sed -i .bak '/^(159|116)/d' ~/.ssh/known_hosts
+	sed -i .bak -E '/^(159|116)/d' ~/.ssh/known_hosts
 
 .PHONY: usage master destroy clean_known_hosts
