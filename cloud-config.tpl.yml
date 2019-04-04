@@ -1,0 +1,12 @@
+#cloud-config
+---
+write_files:
+  - path: /etc/apt/sources.list.d/docker.list
+    content: |
+      deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable
+runcmd:
+  - apt-get install -qq apt-transport-https ca-certificates curl
+  - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
+  - apt-get update -q
+  - apt-get install -qq docker-ce docker-ce-cli containerd.io
+  - docker run -d --privileged --restart=unless-stopped --net=host -v /etc/kubernetes:/etc/kubernetes -v /var/run:/var/run rancher/rancher-agent:%RANCHER_VERSION% --server https://%RANCHER_SERVER% --token %RANCHER_TOKEN% %RANCHER_ROLES%
