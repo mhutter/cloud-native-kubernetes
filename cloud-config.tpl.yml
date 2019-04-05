@@ -1,10 +1,36 @@
 #cloud-config
 ---
 write_files:
+  - path: /etc/ssh/sshd_config
+    content: |
+      AcceptEnv LANG LC_*
+      AuthorizedKeysFile .ssh/authorized_keys
+      ChallengeResponseAuthentication no
+      Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr
+      ClientAliveCountMax 2
+      ClientAliveInterval 120
+      GSSAPIAuthentication no
+      HostKey /etc/ssh/ssh_host_ed25519_key
+      HostKey /etc/ssh/ssh_host_rsa_key
+      KexAlgorithms curve25519-sha256@libssh.org,diffie-hellman-group-exchange-sha256
+      LoginGraceTime 10
+      MACs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,umac-128-etm@openssh.com,hmac-sha2-512,hmac-sha2-256,umac-128@openssh.com
+      MaxStartups 2:30:10
+      PasswordAuthentication no
+      PermitRootLogin without-password
+      Protocol 2
+      PubkeyAuthentication yes
+      Subsystem sftp /usr/lib/sftp-server
+      SyslogFacility AUTHPRIV
+      UseDNS no
+      UsePAM yes
+      UsePrivilegeSeparation sandbox
+      X11Forwarding no
   - path: /etc/apt/sources.list.d/docker.list
     content: |
       deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable
 runcmd:
+  - systemctl restart ssh.service
   - apt-get install -qq apt-transport-https ca-certificates curl
   - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
   - apt-get update -q
